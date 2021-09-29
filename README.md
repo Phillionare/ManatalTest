@@ -9,3 +9,5 @@ I also have the addtional feature listed below
 - Max Student will be 0 by default
 - I also add Ordering, you can do something like 'http://127.0.0.1:8000/students/?order=school&desc'
 - Already have pagination and set as 5
+- Don't have Error handling in some case like when you put the invalid DB field for search and stuff
+- No unit test
