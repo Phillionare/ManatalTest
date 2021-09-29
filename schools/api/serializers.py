@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from schools.models import Student
-from schools.models import School
+from schools.models import Student, School
 
 from pprint import pprint
 
@@ -14,6 +13,7 @@ class StudentSerializer(serializers.ModelSerializer):
             'studentId',
             'school'
         ]
+        extra_kwargs = {'firstName': {'required': False}, 'lastName': {'required': False}} 
         read_only_fields = ['pk']
 
     def validate_school(self,school_obj):
@@ -28,3 +28,4 @@ class SchoolSerializer(serializers.HyperlinkedModelSerializer):
             'pk',
             'name',
             'maxStudent']
+        extra_kwargs = {'name': {'required': False}, 'maxStudent': {'required': False}} 

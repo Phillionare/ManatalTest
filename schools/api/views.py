@@ -1,17 +1,18 @@
-from rest_framework import generics, viewsets
-from rest_framework import pagination
+from rest_framework import viewsets
 from rest_framework.response import Response
-from schools.models import Student, School
-from .serializers import StudentSerializer, SchoolSerializer
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
+from faker import Faker
+
+from schools.models import Student, School
+from .serializers import StudentSerializer, SchoolSerializer
 
 class ResponsePagination(PageNumberPagination):
     page_query_param = 'p'
-    page_size = 2
+    page_size = 5
     page_size_query_param = 'page_size'
-    max_page_size = 3
+    max_page_size = 5
 
 class SchoolViewSet(viewsets.ModelViewSet):
     
@@ -21,6 +22,12 @@ class SchoolViewSet(viewsets.ModelViewSet):
     def list(self, request):
         if 'search' in request.GET:
             self.queryset = self.queryset.filter(name__contains=request.GET['search'])
+        if 'order' in request.GET and bool(request.GET['order']):
+            if 'DESC' in request.GET or 'desc' in request.GET:
+                self.queryset = self.queryset.order_by('-'+request.GET['order'])
+            else:
+                self.queryset = self.queryset.order_by(request.GET['order'])
+
         paginator = ResponsePagination()
         results = paginator.paginate_queryset(self.queryset, request)
         return paginator.get_paginated_response(self.serializer_class(results, many=True).data)
@@ -39,6 +46,11 @@ class StudentViewSet(viewsets.ModelViewSet):
             self.queryset = self.queryset.filter(school=school_pk)
         if 'search' in request.GET:
             self.queryset = self.queryset.filter(Q(firstName__contains=request.GET['search']) | Q(lastName__contains=request.GET['search']) )
+        if 'order' in request.GET and bool(request.GET['order']):
+            if 'DESC' in request.GET or 'desc' in request.GET:
+                self.queryset = self.queryset.order_by('-'+request.GET['order'])
+            else:
+                self.queryset = self.queryset.order_by(request.GET['order'])
 
         paginator = ResponsePagination()
         results = paginator.paginate_queryset(self.queryset, request)
